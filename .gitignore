@@ -1,0 +1,33 @@
+This file tells Git which files and folders to ignore.
+
+Dependencies
+
+Ignore all node_modules folders in the project
+
+/node_modules
+/client/node_modules
+/server/node_modules
+
+Environment Variables
+
+Ignore all .env files to keep your secrets safe
+
+.env
+/client/.env
+/server/.env
+
+Vite build output
+
+/client/dist
+
+Logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+OS-specific files
+
+.DS_Store
+Thumbs.db
