@@ -1,7 +1,7 @@
 import axios from './axiosConfig';
 
 // Get the base API URL from our environment variables
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * Creates the authorization header with the user's token.
@@ -22,7 +22,7 @@ const getAuthHeader = () => {
  */
 const updatePositions = async (boardId, positions) => {
   const response = await axios.put(
-    `${API_URL}/boards/${boardId}/lists/reorder`,
+    `${API_URL}/api/boards/${boardId}/lists/reorder`,
     { positions }
   );
   return response.data;

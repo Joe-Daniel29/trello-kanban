@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 // Get the API URL from our environment variables
-// This should be set in your client/.env file as VITE_API_URL=http://localhost:5000/api
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * Creates the authorization header with the user's token.
@@ -23,7 +22,7 @@ const getBoards = async () => {
   const config = {
     headers: getAuthHeader(),
   };
-  const response = await axios.get(`${API_URL}/boards`, config);
+  const response = await axios.get(`${API_URL}/api/boards`, config);
   return response.data;
 };
 
@@ -35,7 +34,7 @@ const createBoard = async (boardData) => {
   const config = {
     headers: getAuthHeader(),
   };
-  const response = await axios.post(`${API_URL}/boards`, boardData, config);
+  const response = await axios.post(`${API_URL}/api/boards`, boardData, config);
   return response.data;
 };
 
@@ -48,7 +47,7 @@ const getBoardById = async (boardId) => {
     headers: getAuthHeader(),
   };
   // This is the new function that makes the API call
-  const response = await axios.get(`${API_URL}/boards/${boardId}`, config);
+  const response = await axios.get(`${API_URL}/api/boards/${boardId}`, config);
   return response.data;
 };
 
