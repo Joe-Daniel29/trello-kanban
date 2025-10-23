@@ -24,11 +24,13 @@ const server = http.createServer(app);
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://localhost:5173',
     'https://trello-kanban-joe.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Access-Control-Allow-Origin']
 }));
 
 // Handle preflight requests
@@ -37,8 +39,13 @@ app.options('*', cors());
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow your React app's origin
-    methods: ["GET", "POST", "PUT", "DELETE"]
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://trello-kanban-joe.vercel.app'
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
   }
 });
 
