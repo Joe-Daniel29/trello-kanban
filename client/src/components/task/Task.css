@@ -1,5 +1,6 @@
 .task-card {
-  background-color: #3a3a4a; /* Lighter than list */
+  background-color: #3a3a4a;
+  /* Lighter than list */
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -59,7 +60,8 @@
 }
 
 .task-checkbox.checked {
-  background-color: #7c72ff; /* Perplexity purple */
+  background-color: #7c72ff;
+  /* Perplexity purple */
   border-color: #7c72ff;
 }
 
@@ -82,4 +84,3 @@
   color: #8a8a9e;
   opacity: 0.8;
 }
-

@@ -24,7 +24,7 @@ const server = http.createServer(app);
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'http://localhost:5173',
+    'http://localhost:3001',
     'https://trello-kanban-joe.vercel.app',
     'https://trello-kanban-backend-joe.vercel.app'
   ],
