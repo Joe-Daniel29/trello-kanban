@@ -8,14 +8,19 @@ const cors = require('cors');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB().catch(err => {
-  console.error('MongoDB connection error:', err);
-  // Don't exit the process in production, just log the error
-  if (process.env.NODE_ENV !== 'production') {
-    process.exit(1);
+// Connect to MongoDB (only if not already connected)
+let isConnected = false;
+const connectToDB = async () => {
+  if (isConnected) return;
+  try {
+    await connectDB();
+    isConnected = true;
+    console.log('MongoDB connected successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    throw err;
   }
-});
+};
 
 const app = express();
 const server = http.createServer(app);
@@ -53,9 +58,34 @@ const io = new Server(server, {
 // Middleware for parsing JSON
 app.use(express.json());
 
+// Middleware to ensure database connection
+app.use(async (req, res, next) => {
+  try {
+    await connectToDB();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(500).json({
+      message: 'Database connection failed',
+      error: error.message
+    });
+  }
+});
+
 // API test route
 app.get('/', (req, res) => {
   res.send('Kanban Board API is running!');
+});
+
+// Debug route to check environment variables (remove in production)
+app.get('/debug', (req, res) => {
+  res.json({
+    message: 'Debug info',
+    hasMongoUri: !!process.env.MONGO_URI,
+    hasJwtSecret: !!process.env.JWT_SECRET,
+    nodeEnv: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL
+  });
 });
 
 // === API Routes ===
