@@ -2,8 +2,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const cors = require('cors'); // Import cors
+const connectDB = require('../config/db');
+const cors = require('cors');
 
 // Load environment variables
 dotenv.config();
@@ -59,10 +59,10 @@ app.get('/', (req, res) => {
 });
 
 // === API Routes ===
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/boards', require('./routes/boards'));
-app.use('/api/lists', require('./routes/lists'));
-app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/auth', require('../routes/auth'));
+app.use('/api/boards', require('../routes/boards'));
+app.use('/api/lists', require('../routes/lists'));
+app.use('/api/tasks', require('../routes/tasks'));
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -99,12 +99,3 @@ app.use((err, req, res, next) => {
 
 // Export the app for Vercel
 module.exports = app;
-
-// Only start the server if not in Vercel environment
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  const PORT = process.env.PORT || 5000;
-  server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
-
