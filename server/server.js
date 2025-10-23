@@ -22,7 +22,10 @@ const server = http.createServer(app);
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: ['http://localhost:5173'],  // We'll add the production URL once we deploy the frontend
+  origin: [
+    'http://localhost:3000',
+    'https://trello-kanban-joe.vercel.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
