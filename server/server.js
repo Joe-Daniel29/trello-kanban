@@ -1,46 +1,75 @@
 const express = require('express');
-const dotenv = require('dotenv').config();
-const connectDB = require('./config/db');
-const { createServer } = require('http');
+const http = require('http');
 const { Server } = require('socket.io');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+const cors = require('cors'); // Import cors
 
-const port = process.env.PORT || 5000;
+// Load environment variables
+dotenv.config();
 
-// Connect to database
+// Connect to MongoDB
 connectDB();
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
+const server = http.createServer(app);
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://trello-kanban-client.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+
+// Initialize Socket.io
+const io = new Server(server, {
   cors: {
-    origin: '*', // Adjust for production
-  },
+    origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow your React app's origin
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }
 });
 
-// Middleware to parse JSON and urlencoded data
+// Middleware for parsing JSON
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-
-// API Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/boards', require('./routes/boards')); // Add this line
-
+// API test route
 app.get('/', (req, res) => {
-    res.send('Kanban Board API is running!');
+  res.send('Kanban Board API is running!');
 });
 
+// === API Routes ===
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/boards', require('./routes/boards'));
+// We will add more routes here (lists, tasks, etc.)
 
-// Socket.io connection
+// Socket.io connection handling
 io.on('connection', (socket) => {
-  console.log('a user connected:', socket.id);
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinBoard', (boardId) => {
+    socket.join(boardId);
+    console.log(`User ${socket.id} joined board ${boardId}`);
+  });
+
+  // Example: Listen for task movements (we will build this out later)
+  socket.on('taskMove', (data) => {
+    // Broadcast the move to everyone in the same board room
+    io.to(data.boardId).emit('taskMoved', data);
+  });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected:', socket.id);
+    console.log('User disconnected:', socket.id);
   });
 });
 
-httpServer.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Set the port
+const PORT = process.env.PORT || 5000;
+
+// Start the server
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 

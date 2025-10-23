@@ -1,57 +1,83 @@
 const asyncHandler = require('express-async-handler');
-const List = require('../models/List');
 const Board = require('../models/Board');
+const List = require('../models/List');
 
-// @desc    Get all lists for a specific board
-// @route   GET /api/boards/:boardId/lists
+// @desc    Update list positions
+// @route   PUT /api/boards/:boardId/lists/reorder
 // @access  Private
-const getListsForBoard = asyncHandler(async (req, res) => {
-  // Ensure the board exists and belongs to the user
-  const board = await Board.findById(req.params.boardId);
+const updateListPositions = asyncHandler(async (req, res) => {
+  const { positions } = req.body; // Array of { listId, position }
+  const { boardId } = req.params;
+
+  // Update positions in parallel
+  await Promise.all(
+    positions.map(({ listId, position }) =>
+      List.findOneAndUpdate(
+        { _id: listId, board: boardId },
+        { $set: { position } },
+        { new: true }
+      )
+    )
+  );
+
+  // Get all lists in new order
+  const lists = await List.find({ board: boardId })
+    .sort('position')
+    .populate('tasks');
+
+  res.json(lists);
+});
+
+const createList = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+  const { boardId } = req.params;
+
+  if (!title) {
+    res.status(400);
+    throw new Error('Please provide a title for the list');
+  }
+
+  // Find the board to associate the list with
+  const board = await Board.findById(boardId);
 
   if (!board) {
     res.status(404);
     throw new Error('Board not found');
   }
 
-  // Check if the board belongs to the logged-in user
+  // Check if board belongs to the user
   if (board.user.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
   }
 
-  const lists = await List.find({ board: req.params.boardId });
-  res.status(200).json(lists);
-});
-
-// @desc    Create a new list for a board
-// @route   POST /api/boards/:boardId/lists
-// @access  Private
-const createList = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  const { boardId } = req.params;
-
-  if (!name) {
-    res.status(400);
-    throw new Error('Please provide a name for the list');
-  }
+  // Get the highest position in the board
+  const lastList = await List.findOne({ board: boardId })
+    .sort('-position')
+    .limit(1);
   
-  // Check that the parent board exists and belongs to the user
-  const board = await Board.findById(boardId);
-  if (!board || board.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error('User not authorized');
-  }
+  const position = lastList ? lastList.position + 1 : 0;
 
-  const list = await List.create({
-    name,
+  // Create the new list
+  let list = await List.create({
+    title,
     board: boardId,
+    tasks: [],
+    position,
   });
+
+  // Add the new list's ID to the board's lists array
+  board.lists.push(list._id);
+  await board.save();
+
+  // Populate the tasks before sending the response
+  list = await List.findById(list._id).populate('tasks');
 
   res.status(201).json(list);
 });
 
 module.exports = {
-  getListsForBoard,
   createList,
+  updateListPositions
 };
+

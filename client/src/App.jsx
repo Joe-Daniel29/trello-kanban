@@ -1,44 +1,61 @@
-import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import Register from './components/auth/Register';
-import Login from './components/auth/Login';
-import ProtectedRoute from './components/routing/ProtectedRoute';
-import BoardPage from './components/board/BoardPage';
+import { Routes, Route } from 'react-router-dom'; // <-- Removed 'BrowserRouter as Router'
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import Login from './components/auth/Login.jsx';
+import Register from './components/auth/Register.jsx';
+import BoardPage from './components/board/BoardPage.jsx';
+import BoardDetail from './components/board/BoardDetail.jsx'; // <-- The component for the empty page
+import ProtectedRoute from './components/routing/ProtectedRoute.jsx';
+import Header from './components/layout/Header.jsx'; // <-- The new, styled header
 import './App.css';
 
-function App() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+/**
+ * This component contains the main layout and routing logic.
+ * It's wrapped by AuthProvider in the main App function.
+ */
+function AppContent() {
+  const { user } = useAuth(); // Get user state to conditionally render header
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Kanban Board</h1>
-        {user && (
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
-        )}
-      </header>
-      <main className="app-main">
+      {/* This renders our new, styled header instead of the old one */}
+      {user && <Header />}
+      
+      <main className="main-content">
         <Routes>
-          <Route path="/register" element={<Register />} />
+          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
-          
-          {/* Protected Routes */}
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected Routes Wrapper */}
           <Route element={<ProtectedRoute />}>
+            {/* Main dashboard page */}
             <Route path="/" element={<BoardPage />} />
+            
+            {/* THIS IS THE MISSING PIECE:
+              This route matches /board/some-id and renders the BoardDetail component.
+            */}
+            <Route path="/board/:boardId" element={<BoardDetail />} />
           </Route>
+          
         </Routes>
       </main>
     </div>
   );
 }
 
+/**
+ * The main App component just sets up the providers (Auth)
+ * The Router is now in main.jsx
+ */
+function App() {
+  return (
+    <AuthProvider>
+      {/* <Router> was here and is now removed */}
+      <AppContent />
+      {/* </Router> was here and is now removed */}
+    </AuthProvider>
+  );
+}
+
 export default App;
+

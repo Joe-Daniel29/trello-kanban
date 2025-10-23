@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import boardService from '../../services/boardService';
-import './BoardPage.css'; // We'll create this file for styling
+import './BoardPage.css';
 
-const BoardPage = () => {
+function BoardPage() {
   const [boards, setBoards] = useState([]);
   const [newBoardName, setNewBoardName] = useState('');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Get user from localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  // Fetch boards when the component mounts
   useEffect(() => {
     const fetchBoards = async () => {
       try {
         setLoading(true);
         setError(null);
         const data = await boardService.getBoards();
-        setBoards(data);
+        setBoards(data || []); // Ensure boards is always an array
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch boards');
+        setError('Failed to fetch boards. Please try again.');
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -27,65 +30,84 @@ const BoardPage = () => {
     fetchBoards();
   }, []);
 
-  // Handle new board creation
   const handleCreateBoard = async (e) => {
     e.preventDefault();
     if (!newBoardName.trim()) {
-      setError('Board name is required');
+      setError('Board name is required.');
       return;
     }
+
     try {
       setError(null);
       const newBoard = await boardService.createBoard({ name: newBoardName });
-      setBoards([...boards, newBoard]); // Add new board to the list instantly
-      setNewBoardName(''); // Clear the input
+      // Add the new board to the existing list
+      setBoards((prevBoards) => [...prevBoards, newBoard]);
+      setNewBoardName(''); // Clear the input field
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create board');
+      setError('Failed to create board. Please try again.');
+      console.error(err);
     }
   };
 
   return (
     <div className="board-page-container">
+      {/* Welcome Section */}
+      <div className="welcome-section">
+        <h1>Welcome, {user?.name?.toUpperCase() || 'USER'}!</h1>
+        <p>Organize your projects with ease</p>
+      </div>
+
+      {/* Create Board Section */}
       <div className="create-board-section">
-        <h2 className="section-title">Create a New Board</h2>
         <form onSubmit={handleCreateBoard} className="create-board-form">
           <input
             type="text"
-            className="create-board-input"
-            placeholder="e.g., Project Phoenix..."
             value={newBoardName}
             onChange={(e) => setNewBoardName(e.target.value)}
+            placeholder="Enter board name..."
+            className="create-board-input"
+            maxLength="50"
           />
           <button type="submit" className="create-board-button">
-            Create
+            Create Board
           </button>
         </form>
-        {error && <p className="error-message">{error}</p>}
+        {error && <div className="error-message">{error}</div>}
       </div>
 
-      <div className="boards-list-section">
+      {/* Boards Grid Section */}
+      <div className="boards-section">
         <h2 className="section-title">Your Boards</h2>
-        {loading && <p>Loading boards...</p>}
-        {!loading && boards.length === 0 && (
-          <p className="no-boards-message">You haven't created any boards yet.</p>
-        )}
-        <div className="boards-grid">
-          {boards.map((board) => (
-            <Link
-              key={board._id}
-              to={`/board/${board._id}`}
-              className="board-card-link"
-            >
-              <div className="board-card">
-                <span className="board-card-title">{board.name}</span>
+        
+        {loading ? (
+          <div className="loading-indicator">Loading your boards...</div>
+        ) : (
+          <div className="boards-grid">
+            {Array.isArray(boards) && boards.length > 0 ? (
+              boards.map((board) => (
+                <Link
+                  to={`/board/${board._id}`}
+                  key={board._id}
+                  className="board-card"
+                >
+                  <div className="board-card-content">
+                    <h3>{board.name}</h3>
+                    <span className="board-card-arrow">→</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="no-boards-message">
+                <p>No boards yet</p>
+                <p>Create your first board to get started</p>
               </div>
-            </Link>
-          ))}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default BoardPage;
 

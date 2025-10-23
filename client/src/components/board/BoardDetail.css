@@ -1,0 +1,104 @@
+.board-detail-container {
+  padding: 2rem;
+  color: #e0e0e0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.lists-container {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-x: auto;
+  min-height: 0;
+  height: calc(100vh - 150px);
+  align-items: flex-start;
+}
+
+/* Ensure the ghost image has proper dimensions */
+.sortable-ghost {
+  opacity: 0.3;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.board-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff; /* Make the main title white */
+}
+
+/* Form for adding a new list */
+.add-list-form {
+  margin-bottom: 2rem;
+  background-color: #2a2d35;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #3a3e4a;
+}
+
+.add-list-form h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #f0f0f0;
+}
+
+.add-list-form form {
+  display: flex;
+  gap: 1rem;
+}
+
+.add-list-form input[type="text"] {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  background-color: #1e2025;
+  border: 1px solid #3a3e4a;
+  color: #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.add-list-form input[type="text"]::placeholder {
+  color: #6b7280;
+}
+
+.add-list-form input[type="text"]:focus {
+  border-color: #7c3aed;
+}
+
+.add-list-form button {
+  padding: 0.75rem 1.5rem;
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-list-form button:hover {
+  background-color: #6d28d9;
+}
+
+/* Container for all the lists */
+.lists-container {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto; /* Allows for horizontal scrolling */
+  padding-bottom: 1rem; /* Adds some space for the scrollbar */
+}
+

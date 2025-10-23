@@ -1,47 +1,46 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const CommentSchema = new Schema({
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    text: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const AttachmentSchema = new Schema({
-    url: { type: String, required: true },
-    filename: { type: String, required: true },
-    uploadedAt: { type: Date, default: Date.now }
-});
-
-const TaskSchema = new Schema({
-  title: {
-    type: String,
-    required: [true, 'Please add a title'],
-    trim: true,
+const TaskSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    list: {
+      type: Schema.Types.ObjectId,
+      ref: 'List',
+      required: true,
+    },
+    board: {
+      type: Schema.Types.ObjectId,
+      ref: 'Board',
+      required: true,
+    },
+    // --- NEW FIELD ---
+    isCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    // --- --- --- ---
+    // We can add more Trello-like fields here later
+    // description: { type: String },
+    // dueDate: { type: Date },
+    // labels: [{ type: String }],
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    position: {
+      type: Number,
+      default: 0,
+    },
   },
-  description: {
-    type: String,
-  },
-  list: {
-    type: Schema.Types.ObjectId,
-    ref: 'List',
-    required: true,
-  },
-  board: {
-    type: Schema.Types.ObjectId,
-    ref: 'Board',
-    required: true,
-  },
-  assignedTo: [{
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-  }],
-  attachments: [AttachmentSchema],
-  comments: [CommentSchema],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: true, // Adds createdAt and updatedAt
+  }
+);
 
 module.exports = mongoose.model('Task', TaskSchema);
+

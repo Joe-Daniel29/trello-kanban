@@ -1,14 +1,21 @@
-const express = require('express');
-const router = express.Router();
-const { getBoards, createBoard } = require('../controllers/boards');
-const { protect } = require('../middleware/authMiddleware');
+    const express = require('express');
+    const router = express.Router();
+    const {
+    getBoards,
+    createBoard,
+    getBoardById,
+    } = require('../controllers/boards');
+    const { protect } = require('../middleware/authMiddleware');
 
-// Re-route into other resource routers
-const listRouter = require('./lists');
-router.use('/:boardId/lists', listRouter);
+    // Import the list router
+    const listRouter = require('./lists');
 
-// All routes here are protected
-router.route('/').get(protect, getBoards).post(protect, createBoard);
+    router.route('/').get(protect, getBoards).post(protect, createBoard);
+    router.route('/:id').get(protect, getBoardById);
 
-module.exports = router;
+    // This line tells Express to use the listRouter for any requests
+    // that match the pattern /api/boards/:boardId/lists
+    router.use('/:boardId/lists', listRouter);
+
+    module.exports = router;
 

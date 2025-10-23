@@ -1,0 +1,85 @@
+.task-card {
+  background-color: #3a3a4a; /* Lighter than list */
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  touch-action: none;
+}
+
+.task-card.is-dragging {
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  cursor: grabbing !important;
+  background-color: #4a4a5a;
+  opacity: 0.9;
+}
+
+.task-card:hover {
+  background-color: #4a4a5a;
+}
+
+.task-title {
+  color: #e0e0e0;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-left: 12px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+/* Checkbox and Completed State */
+.task-checkbox-wrapper {
+  padding: 4px;
+  margin: -4px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #8a8a9e;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-checkbox-wrapper:hover .task-checkbox {
+  border-color: #c0c0d0;
+  transform: scale(1.1);
+}
+
+.task-checkbox.checked {
+  background-color: #7c72ff; /* Perplexity purple */
+  border-color: #7c72ff;
+}
+
+.task-check-svg {
+  width: 14px;
+  height: 14px;
+  color: #ffffff;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.15s ease-out;
+}
+
+.task-checkbox.checked .task-check-svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.task-card.task-completed .task-title {
+  text-decoration: line-through;
+  color: #8a8a9e;
+  opacity: 0.8;
+}
+

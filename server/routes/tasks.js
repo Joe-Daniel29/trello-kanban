@@ -1,12 +1,20 @@
 const express = require('express');
-// mergeParams is crucial for accessing :boardId and :listId
-const router = express.Router({ mergeParams: true }); 
-const { getTasks, createTask } = require('../controllers/tasks');
+
+// We MUST set mergeParams: true for the router to access :listId
+const router = express.Router({ mergeParams: true });
+
+const { createTask, updateTask, updateTaskPositions } = require('../controllers/tasks');
 const { protect } = require('../middleware/authMiddleware');
 
-// All these routes are protected
-router.use(protect);
+// This route handles POST requests to /api/boards/:boardId/lists/:listId/tasks
+router.route('/').post(protect, createTask);
 
-router.route('/').get(getTasks).post(createTask);
+// This route handles PUT requests to /api/boards/:boardId/lists/:listId/tasks/reorder
+// Put more specific routes before parameter routes
+router.route('/reorder').put(protect, updateTaskPositions);
+
+// This route handles PUT requests to /api/boards/:boardId/lists/:listId/tasks/:taskId
+router.route('/:taskId').put(protect, updateTask);
 
 module.exports = router;
+
