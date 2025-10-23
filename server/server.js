@@ -18,11 +18,15 @@ const server = http.createServer(app);
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'https://trello-kanban-tg9m.vercel.app',
     'https://trello-kanban-client.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Initialize Socket.io
 const io = new Server(server, {
