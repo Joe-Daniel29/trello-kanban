@@ -7,13 +7,16 @@ const User = require('../models/User');
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   // Basic validation
-  if (!name || !email || !password) {
+  if (!username || !email || !password) {
     res.status(400);
     throw new Error('Please add all fields');
   }
+
+  // Log the request body for debugging
+  console.log('Register attempt:', { username, email });
 
   // Check if user already exists
   const userExists = await User.findOne({ email });
@@ -28,6 +31,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Create the user
   const user = await User.create({
+    name: username, // using username as name
     name,
     email,
     password: hashedPassword,
