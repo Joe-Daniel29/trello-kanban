@@ -1,7 +1,9 @@
 import axios from './axiosConfig';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const AUTH_URL = `${API_URL}/api/auth`;
+// Remove trailing slash if present to avoid double slashes
+const cleanApiUrl = API_URL.replace(/\/$/, '');
+const AUTH_URL = `${cleanApiUrl}/api/auth`;
 
 // Register user
 const register = async (userData) => {

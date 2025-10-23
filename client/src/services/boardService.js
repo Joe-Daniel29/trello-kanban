@@ -2,6 +2,8 @@ import axios from 'axios';
 
 // Get the API URL from our environment variables
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Remove trailing slash if present to avoid double slashes
+const cleanApiUrl = API_URL.replace(/\/$/, '');
 
 /**
  * Creates the authorization header with the user's token.
@@ -22,7 +24,7 @@ const getBoards = async () => {
   const config = {
     headers: getAuthHeader(),
   };
-  const response = await axios.get(`${API_URL}/api/boards`, config);
+  const response = await axios.get(`${cleanApiUrl}/api/boards`, config);
   return response.data;
 };
 
@@ -34,7 +36,7 @@ const createBoard = async (boardData) => {
   const config = {
     headers: getAuthHeader(),
   };
-  const response = await axios.post(`${API_URL}/api/boards`, boardData, config);
+  const response = await axios.post(`${cleanApiUrl}/api/boards`, boardData, config);
   return response.data;
 };
 
@@ -47,7 +49,7 @@ const getBoardById = async (boardId) => {
     headers: getAuthHeader(),
   };
   // This is the new function that makes the API call
-  const response = await axios.get(`${API_URL}/api/boards/${boardId}`, config);
+  const response = await axios.get(`${cleanApiUrl}/api/boards/${boardId}`, config);
   return response.data;
 };
 

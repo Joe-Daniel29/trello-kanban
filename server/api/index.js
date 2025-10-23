@@ -42,6 +42,12 @@ app.use(cors({
 // Handle preflight requests
 app.options('*', cors());
 
+// Debug middleware to log requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  next();
+});
+
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
