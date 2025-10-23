@@ -61,7 +61,8 @@ app.get('/', (req, res) => {
 // === API Routes ===
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/boards', require('./routes/boards'));
-// We will add more routes here (lists, tasks, etc.)
+app.use('/api/lists', require('./routes/lists'));
+app.use('/api/tasks', require('./routes/tasks'));
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
