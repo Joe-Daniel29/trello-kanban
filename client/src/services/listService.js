@@ -2,6 +2,8 @@ import axios from './axiosConfig';
 
 // Get the base API URL from our environment variables
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Remove trailing slash if present to avoid double slashes
+const cleanApiUrl = API_URL.replace(/\/$/, '');
 
 /**
  * Creates the authorization header with the user's token.
@@ -22,7 +24,7 @@ const getAuthHeader = () => {
  */
 const updatePositions = async (boardId, positions) => {
   const response = await axios.put(
-    `${API_URL}/api/boards/${boardId}/lists/reorder`,
+    `${cleanApiUrl}/api/boards/${boardId}/lists/reorder`,
     { positions }
   );
   return response.data;
@@ -33,9 +35,9 @@ const createList = async (boardId, listData) => {
     // The backend model expects 'title', but the frontend is sending 'name'.
     const formattedData = { title: listData.name };
 
-    // Construct the proper URL with /boards/
+    // Construct the proper URL with /api/boards/
     const response = await axios.post(
-      `${API_URL}/boards/${boardId}/lists`,
+      `${cleanApiUrl}/api/boards/${boardId}/lists`,
       formattedData
     );
 

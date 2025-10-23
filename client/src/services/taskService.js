@@ -2,6 +2,8 @@ import axios from './axiosConfig';
 
 // Get the API URL from our environment variables
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Remove trailing slash if present to avoid double slashes
+const cleanApiUrl = API_URL.replace(/\/$/, '');
 
 /**
  * Creates the authorization header with the user's token.
@@ -28,7 +30,7 @@ const createTask = async (boardId, listId, taskData) => {
   // We send { title: ... } but our controller is expecting { title: ... }
   // So this is a 1:1 match, no transformation needed.
   const response = await axios.post(
-    `${API_URL}/api/boards/${boardId}/lists/${listId}/tasks`,
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/tasks`,
     taskData,
     config
   );
@@ -48,7 +50,7 @@ const updateTask = async (boardId, listId, taskId, taskData) => {
     headers: getAuthHeader(),
   };
   const response = await axios.put(
-    `${API_URL}/api/boards/${boardId}/lists/${listId}/tasks/${taskId}`,
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/tasks/${taskId}`,
     taskData,
     config
   );
@@ -67,7 +69,7 @@ const updatePositions = async (boardId, listId, positions) => {
     headers: getAuthHeader(),
   };
   const response = await axios.put(
-    `${API_URL}/api/boards/${boardId}/lists/${listId}/tasks/reorder`,
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/tasks/reorder`,
     { positions },
     config
   );
