@@ -67,10 +67,18 @@ app.use(express.json());
 // Middleware to ensure database connection
 app.use(async (req, res, next) => {
   try {
+    console.log('Attempting database connection...');
     await connectToDB();
+    console.log('Database connection successful');
     next();
   } catch (error) {
     console.error('Database connection failed:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
     res.status(500).json({
       message: 'Database connection failed',
       error: error.message

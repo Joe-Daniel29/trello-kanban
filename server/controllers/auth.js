@@ -7,15 +7,19 @@ const User = require('../models/User');
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
+  console.log('Register user request received:', { username: req.body.username, email: req.body.email });
+  
   const { username, email, password } = req.body;
 
   // Basic validation
   if (!username || !email || !password) {
+    console.log('Validation failed: missing fields');
     res.status(400);
     throw new Error('Please add all fields');
   }
 
   try {
+    console.log('Starting user registration process...');
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
