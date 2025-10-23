@@ -7,12 +7,12 @@ const User = require('../models/User');
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  console.log('Register user request received:', { username: req.body.username, email: req.body.email });
+  console.log('Register user request received:', { name: req.body.name, email: req.body.email });
   
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   // Basic validation
-  if (!username || !email || !password) {
+  if (!name || !email || !password) {
     console.log('Validation failed: missing fields');
     res.status(400);
     throw new Error('Please add all fields');
@@ -31,9 +31,9 @@ const registerUser = asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user with username as name
+    // Create user with name
     const user = await User.create({
-      name: username,  // Use username for the name field
+      name,  // Use name field directly
       email,
       password: hashedPassword
     });
