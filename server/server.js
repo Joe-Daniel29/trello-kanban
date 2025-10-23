@@ -9,18 +9,20 @@ const cors = require('cors'); // Import cors
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch(err => {
+  console.error('MongoDB connection error:', err);
+  // Don't exit the process in production, just log the error
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
+});
 
 const app = express();
 const server = http.createServer(app);
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://trello-kanban-joe.vercel.app',
-    'https://trello-kanban-client.vercel.app'
-  ],
+  origin: ['http://localhost:5173'],  // We'll add the production URL once we deploy the frontend
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -67,6 +69,15 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
 });
 
