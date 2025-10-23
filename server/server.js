@@ -25,7 +25,8 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://trello-kanban-joe.vercel.app'
+    'https://trello-kanban-joe.vercel.app',
+    'https://trello-kanban-backend-joe.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
