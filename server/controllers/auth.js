@@ -15,8 +15,40 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Please add all fields');
   }
 
-  // Log the request body for debugging
-  console.log('Register attempt:', { username, email });
+  try {
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400);
+      throw new Error('User already exists');
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user with username as name
+    const user = await User.create({
+      name: username,  // Use username for the name field
+      email,
+      password: hashedPassword
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id)
+      });
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      message: 'Registration failed',
+      error: error.message
+    });
+  }
 
   // Check if user already exists
   const userExists = await User.findOne({ email });
