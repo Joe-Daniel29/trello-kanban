@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import boardService from '../../services/boardService.js';
 import listService from '../../services/listService.js';
+import taskService from '../../services/taskService.js';
 import List from '../list/List.jsx';
 import Task from '../task/Task.jsx';
 import './BoardDetail.css';
@@ -29,6 +30,7 @@ const BoardDetail = () => {
   const [newListName, setNewListName] = useState('');
   const [activeId, setActiveId] = useState(null);
   const [activeDragData, setActiveDragData] = useState(null);
+  const [isVerticalScroll, setIsVerticalScroll] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -114,6 +116,29 @@ const BoardDetail = () => {
       return { ...prevBoard, lists: newLists };
     });
   };
+
+  const handleTaskMoved = (listId, taskId, newIndex) => {
+    setBoard((prevBoard) => {
+      const newLists = prevBoard.lists.map((list) => {
+        if (list._id === listId) {
+          const oldIndex = list.tasks.findIndex((task) => task._id === taskId);
+          if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+            const newTasks = arrayMove(list.tasks, oldIndex, newIndex);
+            return { ...list, tasks: newTasks };
+          }
+        }
+        return list;
+      });
+      return { ...prevBoard, lists: newLists };
+    });
+  };
+
+  const handleListArchived = (listId) => {
+    setBoard((prevBoard) => {
+      const newLists = prevBoard.lists.filter(list => list._id !== listId);
+      return { ...prevBoard, lists: newLists };
+    });
+  };
   // --- --- --- --- ---
 
   if (loading) {
@@ -137,26 +162,73 @@ const BoardDetail = () => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setBoard((prevBoard) => {
-        const oldIndex = prevBoard.lists.findIndex((list) => list._id === active.id);
-        const newIndex = prevBoard.lists.findIndex((list) => list._id === over.id);
+      const activeData = active.data.current;
+      const overData = over.data.current;
 
-        const newLists = arrayMove(prevBoard.lists, oldIndex, newIndex);
+      // Handle list reordering
+      if (activeData?.type === 'list' && overData?.type === 'list') {
+        setBoard((prevBoard) => {
+          const oldIndex = prevBoard.lists.findIndex((list) => list._id === active.id);
+          const newIndex = prevBoard.lists.findIndex((list) => list._id === over.id);
 
-        // Update positions in the backend
-        listService.updatePositions(
-          boardId,
-          newLists.map((list, index) => ({
-            listId: list._id,
-            position: index,
-          }))
-        );
+          const newLists = arrayMove(prevBoard.lists, oldIndex, newIndex);
 
-        return {
-          ...prevBoard,
-          lists: newLists,
-        };
-      });
+          // Update positions in the backend
+          listService.updatePositions(
+            boardId,
+            newLists.map((list, index) => ({
+              listId: list._id,
+              position: index,
+            }))
+          );
+
+          return {
+            ...prevBoard,
+            lists: newLists,
+          };
+        });
+      }
+      // Handle task movement between lists
+      else if (activeData?.type === 'task' && overData?.type === 'list') {
+        const task = activeData.task;
+        const targetListId = over.id;
+        const sourceListId = task.list;
+
+        if (sourceListId !== targetListId) {
+          try {
+            // Move task to new list
+            await taskService.moveTask(boardId, task._id, sourceListId, targetListId, 0);
+
+            // Update local state
+            setBoard((prevBoard) => {
+              const newLists = prevBoard.lists.map((list) => {
+                if (list._id === sourceListId) {
+                  // Remove task from source list
+                  return {
+                    ...list,
+                    tasks: list.tasks.filter(t => t._id !== task._id)
+                  };
+                } else if (list._id === targetListId) {
+                  // Add task to target list
+                  return {
+                    ...list,
+                    tasks: [task, ...list.tasks]
+                  };
+                }
+                return list;
+              });
+              return { ...prevBoard, lists: newLists };
+            });
+          } catch (error) {
+            console.error('Failed to move task:', error);
+          }
+        }
+      }
+      // Handle task movement within the same list (fallback to list's own handler)
+      else if (activeData?.type === 'task' && overData?.type === 'task') {
+        // This will be handled by the individual list's DndContext
+        return;
+      }
     }
 
     setActiveId(null);
@@ -165,7 +237,25 @@ const BoardDetail = () => {
 
   return (
     <div className="board-detail-container">
-      <h2 className="board-title">{board.name}</h2>
+      <div className="board-header">
+        <h2 className="board-title">{board.name}</h2>
+        <div className="scroll-toggle-container">
+          <button
+            className={`scroll-toggle ${!isVerticalScroll ? 'active' : ''}`}
+            onClick={() => setIsVerticalScroll(false)}
+            title="Horizontal scroll"
+          >
+            ↔️
+          </button>
+          <button
+            className={`scroll-toggle ${isVerticalScroll ? 'active' : ''}`}
+            onClick={() => setIsVerticalScroll(true)}
+            title="Vertical scroll"
+          >
+            ↕️
+          </button>
+        </div>
+      </div>
 
       <DndContext
         sensors={sensors}
@@ -173,7 +263,7 @@ const BoardDetail = () => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="lists-container">
+        <div className={`lists-container ${isVerticalScroll ? 'vertical-scroll' : 'horizontal-scroll'}`}>
           {/* Lists */}
           {board.lists && board.lists.length > 0 && (
             <SortableContext
@@ -189,6 +279,8 @@ const BoardDetail = () => {
                     list={list}
                     onTaskCreated={handleTaskCreated}
                     onTaskUpdated={handleTaskUpdated}
+                    onTaskMoved={handleTaskMoved}
+                    onListArchived={handleListArchived}
                   />
                 ))}
             </SortableContext>

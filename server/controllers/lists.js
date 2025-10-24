@@ -76,8 +76,53 @@ const createList = asyncHandler(async (req, res) => {
   res.status(201).json(list);
 });
 
+// @desc    Archive a list
+// @route   PUT /api/boards/:boardId/lists/:listId/archive
+// @access  Private
+const archiveList = asyncHandler(async (req, res) => {
+  const { boardId, listId } = req.params;
+
+  // Find the list
+  const list = await List.findById(listId);
+  
+  if (!list) {
+    res.status(404);
+    throw new Error('List not found');
+  }
+
+  // Check if list belongs to the board
+  if (list.board.toString() !== boardId) {
+    res.status(400);
+    throw new Error('List does not belong to this board');
+  }
+
+  // Find the board to check ownership
+  const board = await Board.findById(boardId);
+  
+  if (!board) {
+    res.status(404);
+    throw new Error('Board not found');
+  }
+
+  // Check if board belongs to the user
+  if (board.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  // Remove the list from the board's lists array
+  board.lists = board.lists.filter(id => id.toString() !== listId);
+  await board.save();
+
+  // Delete the list (this will also delete all associated tasks due to cascade)
+  await List.findByIdAndDelete(listId);
+
+  res.json({ message: 'List archived successfully' });
+});
+
 module.exports = {
   createList,
-  updateListPositions
+  updateListPositions,
+  archiveList
 };
 

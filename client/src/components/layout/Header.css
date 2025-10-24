@@ -1,8 +1,8 @@
 .app-header {
   padding: 16px 24px;
-  border-bottom: 1px solid #374151; /* Darker border */
+  border-bottom: 1px solid var(--color-border);
   text-align: left;
-  background-color: #1f2937; /* Slightly lighter header background */
+  background-color: var(--color-surface);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -15,23 +15,6 @@
 .app-header h1 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #f9fafb; /* White header text */
+  color: var(--color-text);
   margin: 0;
-}
-
-.logout-button {
-  background-color: #374151; /* Medium gray */
-  color: #f9fafb; /* White text */
-  border: 1px solid #4b5563; /* Darker border */
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-
-.logout-button:hover {
-  background-color: #4b5563; /* Darker gray on hover */
-  border-color: #6b7280;
 }

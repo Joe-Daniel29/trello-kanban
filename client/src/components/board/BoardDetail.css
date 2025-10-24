@@ -1,27 +1,10 @@
 .board-detail-container {
   padding: 2rem;
-  color: #e0e0e0;
+  color: var(--color-text);
   height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-.lists-container {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  overflow-x: auto;
-  min-height: 0;
-  height: calc(100vh - 150px);
-  align-items: flex-start;
-}
-
-/* Ensure the ghost image has proper dimensions */
-.sortable-ghost {
-  opacity: 0.3;
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
 }
 
 .board-header {
@@ -31,11 +14,93 @@
   margin-bottom: 1.5rem;
 }
 
-.board-header h2 {
+.board-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff; /* Make the main title white */
+  color: var(--color-text);
+  margin: 0;
 }
+
+.scroll-toggle-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.scroll-toggle {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.scroll-toggle:hover {
+  background: var(--color-surface-hover);
+}
+
+.scroll-toggle.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.lists-container {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0;
+  height: calc(100vh - 200px);
+  align-items: flex-start;
+}
+
+.lists-container.horizontal-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-direction: row;
+}
+
+.lists-container.vertical-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+}
+
+/* Custom scrollbar styles for better visibility on mobile */
+.lists-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.lists-container::-webkit-scrollbar-track {
+  background: var(--color-background);
+  border-radius: 4px;
+}
+
+.lists-container::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+.lists-container::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-hover);
+}
+
+/* For Firefox */
+.lists-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-background);
+}
+
+/* Ensure the ghost image has proper dimensions */
+.sortable-ghost {
+  opacity: 0.3;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
 
 /* Form for adding a new list */
 .add-list-form {
@@ -93,12 +158,3 @@
 .add-list-form button:hover {
   background-color: #6d28d9;
 }
-
-/* Container for all the lists */
-.lists-container {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto; /* Allows for horizontal scrolling */
-  padding-bottom: 1rem; /* Adds some space for the scrollbar */
-}
-

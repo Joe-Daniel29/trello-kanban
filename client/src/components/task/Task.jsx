@@ -50,6 +50,7 @@ const Task = ({ task, onTaskUpdated, onTaskDeleted }) => {
       setIsChecked(!newCheckedState);
     }
   };
+
   // --- --- --- --- ---
 
   // Add a class if the task is completed for strike-through styling
@@ -80,7 +81,6 @@ const Task = ({ task, onTaskUpdated, onTaskDeleted }) => {
           )}
         </div>
       </div>
-      {/* --- --- --- --- --- */}
 
       <span className="task-title">{task.title}</span>
     </div>

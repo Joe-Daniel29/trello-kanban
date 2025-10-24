@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'; // <-- Removed 'BrowserRouter as Router'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import Login from './components/auth/Login.jsx';
 import Register from './components/auth/Register.jsx';
 import BoardPage from './components/board/BoardPage.jsx';
@@ -19,7 +20,7 @@ function AppContent() {
     <div className="app">
       {/* This renders our new, styled header instead of the old one */}
       {user && <Header />}
-      
+
       <main className="main-content">
         <Routes>
           {/* Public Routes */}
@@ -30,13 +31,13 @@ function AppContent() {
           <Route element={<ProtectedRoute />}>
             {/* Main dashboard page */}
             <Route path="/" element={<BoardPage />} />
-            
+
             {/* THIS IS THE MISSING PIECE:
               This route matches /board/some-id and renders the BoardDetail component.
             */}
             <Route path="/board/:boardId" element={<BoardDetail />} />
           </Route>
-          
+
         </Routes>
       </main>
     </div>
@@ -49,11 +50,13 @@ function AppContent() {
  */
 function App() {
   return (
-    <AuthProvider>
-      {/* <Router> was here and is now removed */}
-      <AppContent />
-      {/* </Router> was here and is now removed */}
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        {/* <Router> was here and is now removed */}
+        <AppContent />
+        {/* </Router> was here and is now removed */}
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

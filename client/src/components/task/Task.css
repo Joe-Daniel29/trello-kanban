@@ -1,6 +1,5 @@
 .task-card {
-  background-color: #3a3a4a;
-  /* Lighter than list */
+  background-color: var(--color-surface);
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -21,11 +20,11 @@
 }
 
 .task-card:hover {
-  background-color: #4a4a5a;
+  background-color: var(--color-surface-hover);
 }
 
 .task-title {
-  color: #e0e0e0;
+  color: var(--color-text);
   font-size: 14px;
   line-height: 1.4;
   margin-left: 12px;
@@ -46,29 +45,30 @@
 .task-checkbox {
   width: 18px;
   height: 18px;
-  border: 2px solid #8a8a9e;
+  border: 2px solid var(--color-text-secondary);
   border-radius: 50%;
   transition: all 0.2s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent;
+  box-shadow: 0 0 0 1px var(--color-border);
 }
 
 .task-checkbox-wrapper:hover .task-checkbox {
-  border-color: #c0c0d0;
+  border-color: var(--color-text);
   transform: scale(1.1);
 }
 
 .task-checkbox.checked {
-  background-color: #7c72ff;
-  /* Perplexity purple */
-  border-color: #7c72ff;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .task-check-svg {
   width: 14px;
   height: 14px;
-  color: #ffffff;
+  color: var(--color-white);
   opacity: 0;
   transform: scale(0.5);
   transition: all 0.15s ease-out;
@@ -81,6 +81,6 @@
 
 .task-card.task-completed .task-title {
   text-decoration: line-through;
-  color: #8a8a9e;
+  color: var(--color-text-secondary);
   opacity: 0.8;
 }

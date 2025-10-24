@@ -1,14 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay
-} from '@dnd-kit/core';
-import {
   useSortable,
   SortableContext,
   verticalListSortingStrategy,
@@ -16,28 +7,19 @@ import {
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { FaArchive } from 'react-icons/fa';
 import Task from '../task/Task.jsx';
 import './List.css';
 import taskService from '../../services/taskService.js';
+import listService from '../../services/listService.js';
 
-const List = ({ list, onTaskCreated, onTaskUpdated, id }) => {
+const List = ({ list, onTaskCreated, onTaskUpdated, id, onTaskMoved, onListArchived }) => {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [tasks, setTasks] = useState(list.tasks || []);
-  const [activeDragData, setActiveDragData] = useState(null);
+  const [showArchiveButton, setShowArchiveButton] = useState(false);
   const inputRef = useRef(null);
   const composerRef = useRef(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   // Update tasks when list.tasks changes
   useEffect(() => {
@@ -116,52 +98,55 @@ const List = ({ list, onTaskCreated, onTaskUpdated, id }) => {
     }
   };
 
-  const handleDragStart = (event) => {
-    const { active } = event;
-    const task = tasks.find(t => t._id === active.id);
-    setActiveDragData({ type: 'task', task });
-  };
+  // Handle task movement within the same list
+  const handleTaskMove = async (taskId, newIndex) => {
+    const oldIndex = tasks.findIndex((task) => task._id === taskId);
 
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
+    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+      setTasks(newTasks);
 
-    if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex((task) => task._id === active.id);
-      const newIndex = tasks.findIndex((task) => task._id === over.id);
+      // Update positions in the backend
+      try {
+        const positionsToUpdate = newTasks.map((task, index) => ({
+          taskId: task._id,
+          position: index,
+        }));
 
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newTasks = arrayMove(tasks, oldIndex, newIndex);
-        setTasks(newTasks);
-
-        // Update positions in the backend
-        try {
-          const positionsToUpdate = newTasks.map((task, index) => ({
-            taskId: task._id,
-            position: index,
-          }));
-
-          console.log('Updating positions:', {
-            boardId: list.board,
-            listId: list._id,
-            positions: positionsToUpdate
-          });
-
-          await taskService.updatePositions(
-            list.board,
-            list._id,
-            positionsToUpdate
-          );
-        } catch (error) {
-          console.error('Failed to update task positions:', error);
-          // Revert to original order on error
-          setTasks(tasks);
-        }
+        await taskService.updatePositions(
+          list.board,
+          list._id,
+          positionsToUpdate
+        );
+      } catch (error) {
+        console.error('Failed to update task positions:', error);
+        // Revert to original order on error
+        setTasks(tasks);
       }
     }
   };
 
+  const handleArchive = async (e) => {
+    e.stopPropagation();
+
+    try {
+      await listService.archiveList(list.board, list._id);
+      if (onListArchived) {
+        onListArchived(list._id);
+      }
+    } catch (error) {
+      console.error('Failed to archive list:', error);
+    }
+  };
+
   return (
-    <div ref={setNodeRef} style={style} className={`list-wrapper ${isDragging ? 'is-dragging' : ''}`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`list-wrapper ${isDragging ? 'is-dragging' : ''}`}
+      onMouseEnter={() => setShowArchiveButton(true)}
+      onMouseLeave={() => setShowArchiveButton(false)}
+    >
       <div className="list-header" {...attributes} {...listeners}>
         <div className="drag-handle">
           <div className="dots-grid">
@@ -171,39 +156,34 @@ const List = ({ list, onTaskCreated, onTaskUpdated, id }) => {
           </div>
         </div>
         <h3 className="list-title">{list.title}</h3>
+        {showArchiveButton && (
+          <button
+            className="list-archive-button"
+            onClick={handleArchive}
+            title="Archive list"
+          >
+            <FaArchive />
+          </button>
+        )}
       </div>
 
-      <div className="list-tasks">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          {Array.isArray(tasks) && (
-            <SortableContext
-              items={tasks.map(task => task._id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {tasks.map((task) => (
-                <Task
-                  key={task._id}
-                  id={task._id}
-                  task={task}
-                  onTaskUpdated={onTaskUpdated}
-                />
-              ))}
-            </SortableContext>
-          )}
-
-          <DragOverlay>
-            {activeDragData?.type === 'task' && (
+      <div className="list-tasks" data-list-id={list._id}>
+        {Array.isArray(tasks) && (
+          <SortableContext
+            items={tasks.map(task => task._id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {tasks.map((task) => (
               <Task
-                task={activeDragData.task}
-                isDragging={true}
+                key={task._id}
+                id={task._id}
+                task={task}
+                onTaskUpdated={onTaskUpdated}
+                onTaskMoved={handleTaskMove}
               />
-            )}
-          </DragOverlay>
-        </DndContext>
+            ))}
+          </SortableContext>
+        )}
       </div>
 
       <div className="list-footer">

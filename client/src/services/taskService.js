@@ -76,10 +76,50 @@ const updatePositions = async (boardId, listId, positions) => {
   return response.data;
 };
 
+/**
+ * Moves a task from one list to another
+ * @param {string} boardId - The ID of the board
+ * @param {string} taskId - The ID of the task to move
+ * @param {string} fromListId - The ID of the source list
+ * @param {string} toListId - The ID of the destination list
+ * @param {number} position - The position in the destination list
+ */
+const moveTask = async (boardId, taskId, fromListId, toListId, position = 0) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.put(
+    `${cleanApiUrl}/api/boards/${boardId}/tasks/${taskId}/move`,
+    { fromListId, toListId, position },
+    config
+  );
+  return response.data;
+};
+
+/**
+ * Archives a task
+ * @param {string} boardId - The ID of the board
+ * @param {string} listId - The ID of the list containing the task
+ * @param {string} taskId - The ID of the task to archive
+ */
+const archiveTask = async (boardId, listId, taskId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.put(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/tasks/${taskId}/archive`,
+    {},
+    config
+  );
+  return response.data;
+};
+
 const taskService = {
   createTask,
   updateTask,
   updatePositions,
+  moveTask,
+  archiveTask,
 };
 
 export default taskService;

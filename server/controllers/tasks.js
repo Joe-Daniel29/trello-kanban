@@ -120,9 +120,87 @@ const updateTaskPositions = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Move a task from one list to another
+// @route   PUT /api/boards/:boardId/tasks/:taskId/move
+// @access  Private
+const moveTask = asyncHandler(async (req, res) => {
+  const { boardId, taskId } = req.params;
+  const { fromListId, toListId, position } = req.body;
+
+  if (!fromListId || !toListId) {
+    res.status(400);
+    throw new Error('fromListId and toListId are required');
+  }
+
+  // Find the task
+  const task = await Task.findById(taskId);
+  
+  if (!task) {
+    res.status(404);
+    throw new Error('Task not found');
+  }
+
+  // Check if task belongs to the board
+  if (task.board.toString() !== boardId) {
+    res.status(400);
+    throw new Error('Task does not belong to this board');
+  }
+
+  // Check if task belongs to the source list
+  if (task.list.toString() !== fromListId) {
+    res.status(400);
+    throw new Error('Task does not belong to the source list');
+  }
+
+  // Check if the task's user matches the requesting user
+  if (task.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  // Verify both lists exist and belong to the board
+  const [sourceList, targetList] = await Promise.all([
+    List.findById(fromListId),
+    List.findById(toListId)
+  ]);
+
+  if (!sourceList || !targetList) {
+    res.status(404);
+    throw new Error('Source or target list not found');
+  }
+
+  if (sourceList.board.toString() !== boardId || targetList.board.toString() !== boardId) {
+    res.status(400);
+    throw new Error('Lists do not belong to this board');
+  }
+
+  // Remove task from source list
+  await List.findByIdAndUpdate(fromListId, {
+    $pull: { tasks: taskId }
+  });
+
+  // Add task to target list
+  await List.findByIdAndUpdate(toListId, {
+    $push: { tasks: taskId }
+  });
+
+  // Update task's list and position
+  const newPosition = position !== undefined ? position : 0;
+  await Task.findByIdAndUpdate(taskId, {
+    list: toListId,
+    position: newPosition
+  });
+
+  // Get the updated task
+  const updatedTask = await Task.findById(taskId);
+  
+  res.json(updatedTask);
+});
+
 module.exports = {
   createTask,
   updateTask,
-  updateTaskPositions
+  updateTaskPositions,
+  moveTask
 };
 

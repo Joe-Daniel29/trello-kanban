@@ -1,0 +1,95 @@
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-surface);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.theme-toggle-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.theme-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.theme-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.theme-option:hover {
+    background: var(--color-surface-hover);
+}
+
+.theme-option.active {
+    border-color: var(--color-primary);
+    background: var(--color-surface-hover);
+}
+
+.theme-preview {
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.theme-preview-primary {
+    width: 100%;
+    height: 60%;
+    background: var(--color-primary);
+}
+
+.theme-preview-secondary {
+    width: 100%;
+    height: 40%;
+    background: var(--color-surface);
+}
+
+.theme-name {
+    font-size: 0.75rem;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+/* Theme-specific preview colors */
+.theme-preview.theme-dark .theme-preview-primary {
+    background: #7c3aed;
+}
+
+.theme-preview.theme-dark .theme-preview-secondary {
+    background: #2a2d35;
+}
+
+.theme-preview.theme-light .theme-preview-primary {
+    background: #7c3aed;
+}
+
+.theme-preview.theme-light .theme-preview-secondary {
+    background: #f8fafc;
+}
+
+.theme-preview.theme-blue .theme-preview-primary {
+    background: #3b82f6;
+}
+
+.theme-preview.theme-blue .theme-preview-secondary {
+    background: #1e293b;
+}

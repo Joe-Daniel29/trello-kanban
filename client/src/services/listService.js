@@ -53,9 +53,27 @@ const createList = async (boardId, listData) => {
   }
 };
 
+/**
+ * Archives a list
+ * @param {string} boardId - The ID of the board
+ * @param {string} listId - The ID of the list to archive
+ */
+const archiveList = async (boardId, listId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.put(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/archive`,
+    {},
+    config
+  );
+  return response.data;
+};
+
 const listService = {
   createList,
   updatePositions,
+  archiveList,
 };
 
 export default listService;
