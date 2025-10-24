@@ -11,51 +11,27 @@ A full-stack MERN application that provides a comprehensive project management s
 
 ## 📋 Project Overview
 
-This Kanban board application is a modern, feature-rich project management tool inspired by Trello. It provides an intuitive drag-and-drop interface for organizing tasks across customizable lists and boards, with advanced features for team collaboration and project tracking.
+This Kanban board application is a modern project management tool inspired by Trello. It provides an intuitive drag-and-drop interface for organizing tasks across customizable lists and boards, with a clean and responsive user interface.
 
 ### 🎯 Key Features
 
 #### **Core Functionality**
 - **Multi-Board Management**: Create and manage multiple project boards
-- **Drag & Drop Interface**: Intuitive task and list reordering with smooth animations
-- **Real-time Collaboration**: Live updates using Socket.io for team collaboration
+- **Drag & Drop Interface**: Intuitive task and list reordering with smooth animations using @dnd-kit
 - **User Authentication**: Secure JWT-based authentication system
 - **Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
 
-#### **Advanced Task Management**
-- **Rich Task Details**: Click any task to open a detailed modal with:
-  - Task descriptions and notes
-  - Due dates with overdue indicators
-  - Priority levels (Low, Medium, High, Urgent) with color coding
-  - Custom labels and tags
-  - Task completion status
-- **Visual Priority System**: Color-coded priority indicators on task cards
-- **Overdue Task Highlighting**: Automatic detection and visual highlighting of overdue tasks
+#### **Task Management**
+- **Task Creation**: Create tasks within lists with titles
+- **Task Completion**: Mark tasks as complete/incomplete
+- **Task Reordering**: Drag and drop tasks within lists to reorder
+- **Task Movement**: Move tasks between different lists
 
-#### **Search & Filtering**
-- **Global Search**: Search across task titles, descriptions, and labels
-- **Advanced Filtering**:
-  - Filter by priority level
-  - Filter by completion status (completed/incomplete)
-  - Filter overdue tasks only
-  - Real-time filtering as you type
-
-#### **Board Templates**
-- **6 Pre-built Templates**:
-  - **Basic Kanban**: To Do → In Progress → Done
-  - **Project Management**: Backlog → Planning → In Progress → Review → Testing → Deployed
-  - **Bug Tracking**: New Bugs → In Progress → Testing → Resolved
-  - **Content Calendar**: Ideas → Research → Writing → Review → Published
-  - **Sales Pipeline**: Leads → Qualified → Proposal → Negotiation → Closed Won/Lost
-  - **Personal Tasks**: To Do → This Week → In Progress → Completed
-- **Visual Template Preview**: See how each template looks before creating
-- **One-click Setup**: Automatically creates boards with pre-configured lists
-
-#### **Data Management**
-- **Export Functionality**: Download all boards as JSON for backup
-- **Import Functionality**: Upload JSON files or paste data to restore boards
-- **File Upload Support**: Drag and drop JSON files for easy data restoration
-- **Data Validation**: Ensures import data integrity and format validation
+#### **List Management**
+- **List Creation**: Add custom lists to organize tasks
+- **List Reordering**: Drag and drop lists to reorganize your board
+- **List Archiving**: Archive lists you no longer need
+- **Archive Management**: View, unarchive, or permanently delete archived lists
 
 ---
 
@@ -104,7 +80,7 @@ This Kanban board application is a modern, feature-rich project management tool 
    **Terminal 1 (Backend):**
    ```bash
    cd server
-   npm run dev
+   npm start
    ```
 
    **Terminal 2 (Frontend):**
@@ -287,10 +263,6 @@ Authorization: Bearer jwt_token_here
           {
             "_id": "task_id",
             "title": "Sample Task",
-            "description": "Task description",
-            "dueDate": "2024-01-15T00:00:00.000Z",
-            "priority": "high",
-            "labels": ["urgent", "frontend"],
             "isCompleted": false,
             "position": 0,
             "list": "list_id",
@@ -359,11 +331,7 @@ Authorization: Bearer jwt_token_here
 **Request Body:**
 ```json
 {
-  "title": "New Task",
-  "description": "Task description",
-  "dueDate": "2024-01-15T00:00:00.000Z",
-  "priority": "medium",
-  "labels": ["urgent", "frontend"]
+  "title": "New Task"
 }
 ```
 
@@ -379,10 +347,6 @@ Authorization: Bearer jwt_token_here
 ```json
 {
   "title": "Updated Task Title",
-  "description": "Updated description",
-  "dueDate": "2024-01-20T00:00:00.000Z",
-  "priority": "high",
-  "labels": ["updated", "backend"],
   "isCompleted": true
 }
 ```
@@ -443,7 +407,7 @@ All API endpoints return consistent error responses:
 - **MongoDB**: NoSQL database for data persistence
 - **Mongoose**: MongoDB object modeling
 - **JWT**: JSON Web Tokens for authentication
-- **Socket.io**: Real-time bidirectional communication
+- **Socket.io**: Real-time communication infrastructure (basic setup)
 - **bcryptjs**: Password hashing
 - **CORS**: Cross-origin resource sharing
 
@@ -486,11 +450,6 @@ All API endpoints return consistent error responses:
 ```javascript
 {
   title: String (required),
-  description: String (default: ''),
-  dueDate: Date (default: null),
-  priority: String (enum: ['low', 'medium', 'high', 'urgent'], default: 'medium'),
-  labels: [String] (default: []),
-  attachments: [String] (default: []),
   isCompleted: Boolean (default: false),
   position: Number (default: 0),
   list: ObjectId (ref: List, required),
@@ -505,29 +464,19 @@ All API endpoints return consistent error responses:
 
 ## 🚀 Features in Detail
 
-### **Real-time Collaboration**
-- Socket.io integration for live updates
-- Multiple users can work on the same board simultaneously
-- Real-time task movements and updates
-- Automatic synchronization across all connected clients
+### **Drag & Drop Interface**
+- Powered by @dnd-kit for smooth, accessible drag and drop
+- Reorder tasks within lists
+- Reorder lists within boards
+- Move tasks between lists
+- Touch-friendly interactions
 
-### **Advanced Search & Filtering**
-- Full-text search across task titles, descriptions, and labels
-- Multi-criteria filtering system
-- Real-time search results
-- Persistent filter states
-
-### **Template System**
-- Pre-configured workflow templates
-- Visual template preview
-- One-click board creation
-- Customizable template structure
-
-### **Data Export/Import**
-- Complete board data export in JSON format
-- File upload and paste-to-import functionality
-- Data validation and error handling
-- Backup and restore capabilities
+### **List Archiving**
+- Archive lists to declutter your board
+- View all archived lists in a dedicated modal
+- Unarchive lists to restore them
+- Permanently delete archived lists
+- Bulk delete all archived lists
 
 ### **Responsive Design**
 - Mobile-first approach
