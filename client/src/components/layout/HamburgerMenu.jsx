@@ -8,7 +8,7 @@ import './HamburgerMenu.css';
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { user, logout } = useAuth();
-    const { currentTheme, changeTheme, themes } = useTheme();
+    const { mode, colorScheme, colorSchemes, toggleMode, changeColorScheme } = useTheme();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -42,28 +42,52 @@ const HamburgerMenu = () => {
                         </div>
 
                         <div className="hamburger-content">
-                            {/* Theme Section */}
+                            {/* Light/Dark Mode Toggle */}
+                            <div className="menu-section">
+                                <div className="menu-section-title">
+                                    {mode === 'light' ? <FaSun /> : <FaMoon />}
+                                    <span>Appearance</span>
+                                </div>
+
+                                <div className="mode-toggle-container">
+                                    <span className={`mode-label ${mode === 'light' ? 'active' : ''}`}>
+                                        <FaSun /> Light
+                                    </span>
+                                    <button 
+                                        className="mode-toggle"
+                                        onClick={toggleMode}
+                                        aria-label="Toggle light/dark mode"
+                                    >
+                                        <div className={`mode-toggle-slider ${mode === 'dark' ? 'dark' : 'light'}`}></div>
+                                    </button>
+                                    <span className={`mode-label ${mode === 'dark' ? 'active' : ''}`}>
+                                        <FaMoon /> Dark
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Color Scheme Section */}
                             <div className="menu-section">
                                 <div className="menu-section-title">
                                     <FaPalette />
-                                    <span>Theme</span>
+                                    <span>Color Scheme</span>
                                 </div>
 
-                                <div className="theme-options">
-                                    {Object.entries(themes).map(([key, theme]) => (
+                                <div className="color-scheme-options">
+                                    {Object.entries(colorSchemes).map(([key, scheme]) => (
                                         <button
                                             key={key}
-                                            className={`theme-option ${currentTheme === key ? 'active' : ''}`}
-                                            onClick={() => {
-                                                changeTheme(key);
-                                                closeMenu();
+                                            className={`color-scheme-button ${colorScheme === key ? 'active' : ''}`}
+                                            onClick={() => changeColorScheme(key)}
+                                            style={{ 
+                                                backgroundColor: scheme.primary,
                                             }}
+                                            aria-label={`${scheme.name} color scheme`}
+                                            title={scheme.name}
                                         >
-                                            <div className={`theme-preview theme-${key}`}>
-                                                <div className="theme-preview-primary"></div>
-                                                <div className="theme-preview-secondary"></div>
-                                            </div>
-                                            <span className="theme-name">{theme.name}</span>
+                                            {colorScheme === key && (
+                                                <div className="color-scheme-check">✓</div>
+                                            )}
                                         </button>
                                     ))}
                                 </div>

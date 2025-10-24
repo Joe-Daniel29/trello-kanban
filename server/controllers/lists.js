@@ -110,19 +110,177 @@ const archiveList = asyncHandler(async (req, res) => {
     throw new Error('User not authorized');
   }
 
+  // Mark the list as archived instead of deleting
+  list.isArchived = true;
+  await list.save();
+
+  res.json({ message: 'List archived successfully', list });
+});
+
+// @desc    Get archived lists for a board
+// @route   GET /api/boards/:boardId/lists/archived
+// @access  Private
+const getArchivedLists = asyncHandler(async (req, res) => {
+  const { boardId } = req.params;
+
+  // Find the board to check ownership
+  const board = await Board.findById(boardId);
+  
+  if (!board) {
+    res.status(404);
+    throw new Error('Board not found');
+  }
+
+  // Check if board belongs to the user
+  if (board.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  // Get all archived lists for this board
+  const archivedLists = await List.find({ 
+    board: boardId, 
+    isArchived: true 
+  }).populate('tasks').sort('-updatedAt');
+
+  res.json(archivedLists);
+});
+
+// @desc    Unarchive a list
+// @route   PUT /api/boards/:boardId/lists/:listId/unarchive
+// @access  Private
+const unarchiveList = asyncHandler(async (req, res) => {
+  const { boardId, listId } = req.params;
+
+  // Find the list
+  const list = await List.findById(listId);
+  
+  if (!list) {
+    res.status(404);
+    throw new Error('List not found');
+  }
+
+  // Check if list belongs to the board
+  if (list.board.toString() !== boardId) {
+    res.status(400);
+    throw new Error('List does not belong to this board');
+  }
+
+  // Find the board to check ownership
+  const board = await Board.findById(boardId);
+  
+  if (!board) {
+    res.status(404);
+    throw new Error('Board not found');
+  }
+
+  // Check if board belongs to the user
+  if (board.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  // Unarchive the list
+  list.isArchived = false;
+  await list.save();
+
+  // Populate tasks before sending response
+  await list.populate('tasks');
+
+  res.json({ message: 'List unarchived successfully', list });
+});
+
+// @desc    Permanently delete a list
+// @route   DELETE /api/boards/:boardId/lists/:listId
+// @access  Private
+const deleteList = asyncHandler(async (req, res) => {
+  const { boardId, listId } = req.params;
+
+  // Find the list
+  const list = await List.findById(listId);
+  
+  if (!list) {
+    res.status(404);
+    throw new Error('List not found');
+  }
+
+  // Check if list belongs to the board
+  if (list.board.toString() !== boardId) {
+    res.status(400);
+    throw new Error('List does not belong to this board');
+  }
+
+  // Find the board to check ownership
+  const board = await Board.findById(boardId);
+  
+  if (!board) {
+    res.status(404);
+    throw new Error('Board not found');
+  }
+
+  // Check if board belongs to the user
+  if (board.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
   // Remove the list from the board's lists array
   board.lists = board.lists.filter(id => id.toString() !== listId);
   await board.save();
 
-  // Delete the list (this will also delete all associated tasks due to cascade)
+  // Delete the list permanently
   await List.findByIdAndDelete(listId);
 
-  res.json({ message: 'List archived successfully' });
+  res.json({ message: 'List deleted permanently' });
+});
+
+// @desc    Delete all archived lists for a board
+// @route   DELETE /api/boards/:boardId/lists/archived
+// @access  Private
+const deleteAllArchivedLists = asyncHandler(async (req, res) => {
+  const { boardId } = req.params;
+
+  // Find the board to check ownership
+  const board = await Board.findById(boardId);
+  
+  if (!board) {
+    res.status(404);
+    throw new Error('Board not found');
+  }
+
+  // Check if board belongs to the user
+  if (board.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  // Find all archived lists for this board
+  const archivedLists = await List.find({ 
+    board: boardId, 
+    isArchived: true 
+  });
+
+  // Remove archived lists from board's lists array
+  const archivedListIds = archivedLists.map(list => list._id.toString());
+  board.lists = board.lists.filter(id => !archivedListIds.includes(id.toString()));
+  await board.save();
+
+  // Delete all archived lists
+  await List.deleteMany({ 
+    board: boardId, 
+    isArchived: true 
+  });
+
+  res.json({ message: 'All archived lists deleted permanently', count: archivedLists.length });
 });
 
 module.exports = {
   createList,
   updateListPositions,
-  archiveList
+  archiveList,
+  getArchivedLists,
+  unarchiveList,
+  deleteList,
+  deleteAllArchivedLists
 };
 

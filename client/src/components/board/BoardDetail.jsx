@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { FaGripLines, FaGripLinesVertical } from 'react-icons/fa';
 import {
   DndContext,
   closestCenter,
@@ -20,6 +21,8 @@ import listService from '../../services/listService.js';
 import taskService from '../../services/taskService.js';
 import List from '../list/List.jsx';
 import Task from '../task/Task.jsx';
+import ArchiveButton from '../archive/ArchiveButton.jsx';
+import ArchiveModal from '../archive/ArchiveModal.jsx';
 import './BoardDetail.css';
 
 const BoardDetail = () => {
@@ -31,6 +34,10 @@ const BoardDetail = () => {
   const [activeId, setActiveId] = useState(null);
   const [activeDragData, setActiveDragData] = useState(null);
   const [isVerticalScroll, setIsVerticalScroll] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [isAddingList, setIsAddingList] = useState(false);
+  const listInputRef = React.useRef(null);
+  const listComposerRef = React.useRef(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -62,6 +69,27 @@ const BoardDetail = () => {
     fetchBoard();
   }, [fetchBoard]);
 
+  useEffect(() => {
+    if (isAddingList && listInputRef.current) {
+      listInputRef.current.focus();
+    }
+
+    const handleClickOutside = (event) => {
+      if (listComposerRef.current && !listComposerRef.current.contains(event.target)) {
+        setIsAddingList(false);
+        setNewListName('');
+      }
+    };
+
+    if (isAddingList) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAddingList]);
+
   const handleAddList = async (e) => {
     e.preventDefault();
     if (!newListName.trim()) return;
@@ -76,9 +104,23 @@ const BoardDetail = () => {
         lists: [...prevBoard.lists, newList],
       }));
       setNewListName('');
+      // Keep the composer open for adding more lists
+      if (listInputRef.current) {
+        listInputRef.current.focus();
+      }
     } catch (err) {
       console.error('Failed to create list:', err);
       setError('Failed to create list. Please try again.');
+    }
+  };
+
+  const handleListKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAddList(e);
+    } else if (e.key === 'Escape') {
+      setIsAddingList(false);
+      setNewListName('');
     }
   };
 
@@ -136,6 +178,14 @@ const BoardDetail = () => {
   const handleListArchived = (listId) => {
     setBoard((prevBoard) => {
       const newLists = prevBoard.lists.filter(list => list._id !== listId);
+      return { ...prevBoard, lists: newLists };
+    });
+  };
+
+  const handleListUnarchived = (unarchivedList) => {
+    setBoard((prevBoard) => {
+      // Add the unarchived list back to the board
+      const newLists = [...prevBoard.lists, unarchivedList];
       return { ...prevBoard, lists: newLists };
     });
   };
@@ -245,14 +295,14 @@ const BoardDetail = () => {
             onClick={() => setIsVerticalScroll(false)}
             title="Horizontal scroll"
           >
-            ↔️
+            <FaGripLines />
           </button>
           <button
             className={`scroll-toggle ${isVerticalScroll ? 'active' : ''}`}
             onClick={() => setIsVerticalScroll(true)}
             title="Vertical scroll"
           >
-            ↕️
+            <FaGripLinesVertical />
           </button>
         </div>
       </div>
@@ -286,20 +336,35 @@ const BoardDetail = () => {
             </SortableContext>
           )}
 
-          {/* Add List Form - Always visible */}
+          {/* Add List Form - Collapsible */}
           <div className="add-list-wrapper">
-            <form onSubmit={handleAddList} className="add-list-form">
-              <input
-                type="text"
-                placeholder="Add a new list"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                className="add-list-input"
-              />
-              <button type="submit" className="add-list-button">
-                Add List
+            {isAddingList ? (
+              <div className="add-list-composer" ref={listComposerRef}>
+                <form onSubmit={handleAddList}>
+                  <input
+                    ref={listInputRef}
+                    type="text"
+                    placeholder="Enter list title..."
+                    value={newListName}
+                    onChange={(e) => setNewListName(e.target.value)}
+                    onKeyDown={handleListKeyDown}
+                    className="add-list-input"
+                  />
+                  <div className="add-list-controls">
+                    <button type="submit" className="add-list-confirm-button">
+                      Add list
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <button
+                className="add-list-button"
+                onClick={() => setIsAddingList(true)}
+              >
+                <span className="add-icon">+</span> Add a list
               </button>
-            </form>
+            )}
           </div>
         </div>
 
@@ -320,6 +385,17 @@ const BoardDetail = () => {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Floating Archive Button */}
+      <ArchiveButton onClick={() => setIsArchiveModalOpen(true)} />
+
+      {/* Archive Modal */}
+      <ArchiveModal
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        boardId={boardId}
+        onListUnarchived={handleListUnarchived}
+      />
     </div>
   );
 };

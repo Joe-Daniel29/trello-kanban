@@ -24,25 +24,34 @@
 .scroll-toggle-container {
   display: flex;
   gap: 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 4px;
 }
 
 .scroll-toggle {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  padding: 0.5rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .scroll-toggle:hover {
   background: var(--color-surface-hover);
+  color: var(--color-text);
 }
 
 .scroll-toggle.active {
   background: var(--color-primary);
+  color: var(--color-white);
   border-color: var(--color-primary);
 }
 
@@ -102,59 +111,93 @@
 }
 
 
-/* Form for adding a new list */
-.add-list-form {
-  margin-bottom: 2rem;
-  background-color: #2a2d35;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #3a3e4a;
-}
-
-.add-list-form h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
+/* Add List Wrapper */
+.add-list-wrapper {
+  flex-shrink: 0;
+  width: 272px;
   margin-bottom: 1rem;
-  color: #f0f0f0;
 }
 
-.add-list-form form {
+.add-list-button {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
 }
 
-.add-list-form input[type="text"] {
-  flex-grow: 1;
-  padding: 0.75rem 1rem;
-  background-color: #1e2025;
-  border: 1px solid #3a3e4a;
-  color: #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
+.add-list-button:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.add-list-button .add-icon {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.add-list-composer {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.add-list-composer form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-list-input {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: 14px;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-.add-list-form input[type="text"]::placeholder {
-  color: #6b7280;
+.add-list-input:focus {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface-hover);
 }
 
-.add-list-form input[type="text"]:focus {
-  border-color: #7c3aed;
+.add-list-input::placeholder {
+  color: var(--color-text-secondary);
 }
 
-.add-list-form button {
-  padding: 0.75rem 1.5rem;
-  background-color: #7c3aed;
-  color: white;
+.add-list-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.add-list-confirm-button {
+  padding: 6px 12px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
   border: none;
   border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 550;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.add-list-form button:hover {
-  background-color: #6d28d9;
+.add-list-confirm-button:hover {
+  background-color: var(--color-primary-hover);
 }

@@ -70,10 +70,77 @@ const archiveList = async (boardId, listId) => {
   return response.data;
 };
 
+/**
+ * Gets archived lists for a board
+ * @param {string} boardId - The ID of the board
+ */
+const getArchivedLists = async (boardId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.get(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/archived`,
+    config
+  );
+  return response.data;
+};
+
+/**
+ * Unarchives a list
+ * @param {string} boardId - The ID of the board
+ * @param {string} listId - The ID of the list to unarchive
+ */
+const unarchiveList = async (boardId, listId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.put(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}/unarchive`,
+    {},
+    config
+  );
+  return response.data;
+};
+
+/**
+ * Permanently deletes a list
+ * @param {string} boardId - The ID of the board
+ * @param {string} listId - The ID of the list to delete
+ */
+const deleteList = async (boardId, listId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.delete(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/${listId}`,
+    config
+  );
+  return response.data;
+};
+
+/**
+ * Deletes all archived lists for a board
+ * @param {string} boardId - The ID of the board
+ */
+const deleteAllArchivedLists = async (boardId) => {
+  const config = {
+    headers: getAuthHeader(),
+  };
+  const response = await axios.delete(
+    `${cleanApiUrl}/api/boards/${boardId}/lists/archived`,
+    config
+  );
+  return response.data;
+};
+
 const listService = {
   createList,
   updatePositions,
   archiveList,
+  getArchivedLists,
+  unarchiveList,
+  deleteList,
+  deleteAllArchivedLists,
 };
 
 export default listService;

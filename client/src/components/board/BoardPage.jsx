@@ -8,6 +8,9 @@ function BoardPage() {
     const [newBoardName, setNewBoardName] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAddingBoard, setIsAddingBoard] = useState(false);
+    const boardInputRef = React.useRef(null);
+    const boardComposerRef = React.useRef(null);
 
     // Get user from localStorage
     const user = JSON.parse(localStorage.getItem('user'));
@@ -30,10 +33,30 @@ function BoardPage() {
         fetchBoards();
     }, []);
 
+    useEffect(() => {
+        if (isAddingBoard && boardInputRef.current) {
+            boardInputRef.current.focus();
+        }
+
+        const handleClickOutside = (event) => {
+            if (boardComposerRef.current && !boardComposerRef.current.contains(event.target)) {
+                setIsAddingBoard(false);
+                setNewBoardName('');
+            }
+        };
+
+        if (isAddingBoard) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isAddingBoard]);
+
     const handleCreateBoard = async (e) => {
         e.preventDefault();
         if (!newBoardName.trim()) {
-            setError('Board name is required.');
             return;
         }
 
@@ -43,9 +66,23 @@ function BoardPage() {
             // Add the new board to the existing list
             setBoards((prevBoards) => [...prevBoards, newBoard]);
             setNewBoardName(''); // Clear the input field
+            // Keep the composer open for adding more boards
+            if (boardInputRef.current) {
+                boardInputRef.current.focus();
+            }
         } catch (err) {
             setError('Failed to create board. Please try again.');
             console.error(err);
+        }
+    };
+
+    const handleBoardKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleCreateBoard(e);
+        } else if (e.key === 'Escape') {
+            setIsAddingBoard(false);
+            setNewBoardName('');
         }
     };
 
@@ -59,20 +96,35 @@ function BoardPage() {
 
             {/* Create Board Section */}
             <div className="create-board-section">
-                <form onSubmit={handleCreateBoard} className="create-board-form">
-                    <input
-                        type="text"
-                        value={newBoardName}
-                        onChange={(e) => setNewBoardName(e.target.value)}
-                        placeholder="Enter board name..."
-                        className="create-board-input"
-                        maxLength="50"
-                    />
-                    <button type="submit" className="create-board-button">
-                        Create Board
+                {isAddingBoard ? (
+                    <div className="create-board-composer" ref={boardComposerRef}>
+                        <form onSubmit={handleCreateBoard}>
+                            <input
+                                ref={boardInputRef}
+                                type="text"
+                                value={newBoardName}
+                                onChange={(e) => setNewBoardName(e.target.value)}
+                                onKeyDown={handleBoardKeyDown}
+                                placeholder="Enter board name..."
+                                className="create-board-input"
+                                maxLength="50"
+                            />
+                            <div className="create-board-controls">
+                                <button type="submit" className="create-board-confirm-button">
+                                    Create board
+                                </button>
+                            </div>
+                        </form>
+                        {error && <div className="error-message">{error}</div>}
+                    </div>
+                ) : (
+                    <button
+                        className="create-board-button-collapsed"
+                        onClick={() => setIsAddingBoard(true)}
+                    >
+                        <span className="add-icon">+</span> Create new board
                     </button>
-                </form>
-                {error && <div className="error-message">{error}</div>}
+                )}
             </div>
 
             {/* Boards Grid Section */}

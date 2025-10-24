@@ -10,113 +10,121 @@ export const useTheme = () => {
     return context;
 };
 
-// Theme configurations
-const themes = {
-    dark: {
-        name: 'Dark',
-        colors: {
-            primary: '#7c3aed',
-            primaryHover: '#6d28d9',
-            background: '#1a1a1a',
-            surface: '#2a2d35',
-            surfaceHover: '#3a3e4a',
-            text: '#e0e0e0',
-            textSecondary: '#6b7280',
-            border: '#3a3e4a',
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            white: '#ffffff'
-        }
-    },
-    light: {
-        name: 'Light',
-        colors: {
-            primary: '#7c3aed',
-            primaryHover: '#6d28d9',
-            background: '#ffffff',
-            surface: '#f8fafc',
-            surfaceHover: '#e2e8f0',
-            text: '#1e293b',
-            textSecondary: '#64748b',
-            border: '#e2e8f0',
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            white: '#ffffff'
-        }
+// Color scheme configurations
+const colorSchemes = {
+    purple: {
+        name: 'Purple',
+        primary: '#7c3aed',
+        primaryHover: '#6d28d9',
     },
     blue: {
         name: 'Blue',
-        colors: {
-            primary: '#3b82f6',
-            primaryHover: '#2563eb',
-            background: '#0f172a',
-            surface: '#1e293b',
-            surfaceHover: '#334155',
-            text: '#e2e8f0',
-            textSecondary: '#94a3b8',
-            border: '#334155',
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            white: '#ffffff'
-        }
+        primary: '#3b82f6',
+        primaryHover: '#2563eb',
     },
-    yellow: {
-        name: 'Yellow',
-        colors: {
-            primary: '#f59e0b',
-            primaryHover: '#d97706',
-            background: '#1f2937',
-            surface: '#374151',
-            surfaceHover: '#4b5563',
-            text: '#f9fafb',
-            textSecondary: '#9ca3af',
-            border: '#4b5563',
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            white: '#ffffff'
-        }
+    green: {
+        name: 'Green',
+        primary: '#10b981',
+        primaryHover: '#059669',
+    },
+    red: {
+        name: 'Red',
+        primary: '#ef4444',
+        primaryHover: '#dc2626',
+    },
+    orange: {
+        name: 'Orange',
+        primary: '#f59e0b',
+        primaryHover: '#d97706',
+    },
+    pink: {
+        name: 'Pink',
+        primary: '#ec4899',
+        primaryHover: '#db2777',
+    }
+};
+
+// Light and dark mode configurations
+const modeConfigs = {
+    light: {
+        background: '#ffffff',
+        surface: '#f8fafc',
+        surfaceHover: '#e2e8f0',
+        text: '#1e293b',
+        textSecondary: '#64748b',
+        border: '#e2e8f0',
+    },
+    dark: {
+        background: '#1a1a1a',
+        surface: '#2a2d35',
+        surfaceHover: '#3a3e4a',
+        text: '#e0e0e0',
+        textSecondary: '#6b7280',
+        border: '#3a3e4a',
     }
 };
 
 export const ThemeProvider = ({ children }) => {
-    const [currentTheme, setCurrentTheme] = useState('dark');
+    const [mode, setMode] = useState('dark'); // 'light' or 'dark'
+    const [colorScheme, setColorScheme] = useState('purple');
 
-    // Load theme from cookies on mount
+    // Load theme settings from cookies on mount
     useEffect(() => {
-        const savedTheme = getCookie('theme');
-        if (savedTheme && themes[savedTheme]) {
-            setCurrentTheme(savedTheme);
+        const savedMode = getCookie('themeMode');
+        const savedColorScheme = getCookie('colorScheme');
+        
+        if (savedMode && modeConfigs[savedMode]) {
+            setMode(savedMode);
+        }
+        if (savedColorScheme && colorSchemes[savedColorScheme]) {
+            setColorScheme(savedColorScheme);
         }
     }, []);
 
     // Apply theme to document root
     useEffect(() => {
-        const theme = themes[currentTheme];
+        const modeConfig = modeConfigs[mode];
+        const colorConfig = colorSchemes[colorScheme];
         const root = document.documentElement;
 
-        Object.entries(theme.colors).forEach(([key, value]) => {
+        // Apply mode-specific colors
+        Object.entries(modeConfig).forEach(([key, value]) => {
             root.style.setProperty(`--color-${key}`, value);
         });
 
-        root.setAttribute('data-theme', currentTheme);
-    }, [currentTheme]);
+        // Apply color scheme
+        root.style.setProperty('--color-primary', colorConfig.primary);
+        root.style.setProperty('--color-primaryHover', colorConfig.primaryHover);
 
-    const changeTheme = (themeName) => {
-        if (themes[themeName]) {
-            setCurrentTheme(themeName);
-            setCookie('theme', themeName, 365); // Save for 1 year
+        // Apply common colors
+        root.style.setProperty('--color-success', '#10b981');
+        root.style.setProperty('--color-warning', '#f59e0b');
+        root.style.setProperty('--color-error', '#ef4444');
+        root.style.setProperty('--color-white', '#ffffff');
+
+        root.setAttribute('data-theme', mode);
+        root.setAttribute('data-color-scheme', colorScheme);
+    }, [mode, colorScheme]);
+
+    const toggleMode = () => {
+        const newMode = mode === 'light' ? 'dark' : 'light';
+        setMode(newMode);
+        setCookie('themeMode', newMode, 365);
+    };
+
+    const changeColorScheme = (scheme) => {
+        if (colorSchemes[scheme]) {
+            setColorScheme(scheme);
+            setCookie('colorScheme', scheme, 365);
         }
     };
 
     const value = {
-        currentTheme,
-        themes,
-        changeTheme,
-        theme: themes[currentTheme]
+        mode,
+        colorScheme,
+        colorSchemes,
+        toggleMode,
+        changeColorScheme,
     };
 
     return (

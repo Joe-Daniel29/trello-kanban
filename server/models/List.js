@@ -23,6 +23,10 @@ const ListSchema = new Schema(
         ref: 'Task',
       },
     ],
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt

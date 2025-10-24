@@ -49,8 +49,8 @@ const getBoardById = asyncHandler(async (req, res) => {
     throw new Error('User not authorized');
   }
 
-  // Then get lists sorted by position and populate tasks with sorting
-  const lists = await List.find({ board: req.params.id })
+  // Then get lists sorted by position and populate tasks with sorting (exclude archived lists)
+  const lists = await List.find({ board: req.params.id, isArchived: false })
     .sort('position')
     .populate({
       path: 'tasks',

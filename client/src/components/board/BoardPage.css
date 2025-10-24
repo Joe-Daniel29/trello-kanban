@@ -28,6 +28,38 @@
 /* Create Board Section */
 .create-board-section {
   margin-bottom: 48px;
+}
+
+.create-board-button-collapsed {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.create-board-button-collapsed:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.create-board-button-collapsed .add-icon {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.create-board-composer {
+  max-width: 500px;
   padding: 24px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -35,19 +67,21 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.create-board-form {
+.create-board-composer form {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .create-board-input {
-  flex-grow: 1;
+  width: 100%;
   padding: 12px 16px;
   border: 2px solid var(--color-border);
   border-radius: 8px;
   font-size: 1rem;
   color: var(--color-text);
   background-color: var(--color-background);
+  box-sizing: border-box;
 }
 
 .create-board-input::placeholder {
@@ -57,22 +91,28 @@
 .create-board-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  background-color: var(--color-surface-hover);
 }
 
-.create-board-button {
-  padding: 12px 24px;
+.create-board-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.create-board-confirm-button {
+  padding: 10px 20px;
   background-color: var(--color-primary);
   color: var(--color-white);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 550;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.create-board-button:hover {
+.create-board-confirm-button:hover {
   background-color: var(--color-primary-hover);
 }
 
