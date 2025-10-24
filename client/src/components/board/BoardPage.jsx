@@ -95,37 +95,6 @@ function BoardPage() {
             </div>
 
             {/* Create Board Section */}
-            <div className="create-board-section">
-                {isAddingBoard ? (
-                    <div className="create-board-composer" ref={boardComposerRef}>
-                        <form onSubmit={handleCreateBoard}>
-                            <input
-                                ref={boardInputRef}
-                                type="text"
-                                value={newBoardName}
-                                onChange={(e) => setNewBoardName(e.target.value)}
-                                onKeyDown={handleBoardKeyDown}
-                                placeholder="Enter board name..."
-                                className="create-board-input"
-                                maxLength="50"
-                            />
-                            <div className="create-board-controls">
-                                <button type="submit" className="create-board-confirm-button">
-                                    Create board
-                                </button>
-                            </div>
-                        </form>
-                        {error && <div className="error-message">{error}</div>}
-                    </div>
-                ) : (
-                    <button
-                        className="create-board-button-collapsed"
-                        onClick={() => setIsAddingBoard(true)}
-                    >
-                        <span className="add-icon">+</span> Create new board
-                    </button>
-                )}
-            </div>
 
             {/* Boards Grid Section */}
             <div className="boards-section">
@@ -135,7 +104,7 @@ function BoardPage() {
                     <div className="loading-indicator">Loading your boards...</div>
                 ) : (
                     <div className="boards-grid">
-                        {Array.isArray(boards) && boards.length > 0 ? (
+                        {Array.isArray(boards) && boards.length > 0 && (
                             boards.map((board) => (
                                 <Link
                                     to={`/board/${board._id}`}
@@ -148,14 +117,43 @@ function BoardPage() {
                                     </div>
                                 </Link>
                             ))
-                        ) : (
-                            <div className="no-boards-message">
-                                <p>No boards yet</p>
-                                <p>Create your first board to get started</p>
+                        )}
+                        
+                        {/* Create Board Card */}
+                        {isAddingBoard ? (
+                            <div className="board-card create-board-composer" ref={boardComposerRef}>
+                                <form onSubmit={handleCreateBoard} className="create-board-form-inline">
+                                    <div className="create-board-input-wrapper">
+                                        <input
+                                            ref={boardInputRef}
+                                            type="text"
+                                            value={newBoardName}
+                                            onChange={(e) => setNewBoardName(e.target.value)}
+                                            onKeyDown={handleBoardKeyDown}
+                                            placeholder="Enter board name..."
+                                            className="create-board-input"
+                                            maxLength="50"
+                                        />
+                                        <button type="submit" className="create-board-confirm-button">
+                                            Add
+                                        </button>
+                                    </div>
+                                </form>
+                                {error && <div className="error-message">{error}</div>}
                             </div>
+                        ) : (
+                            <button
+                                className="board-card create-board-button"
+                                onClick={() => setIsAddingBoard(true)}
+                            >
+                                <div className="board-card-content">
+                                    <h3><span className="add-icon">+</span> Create new board</h3>
+                                </div>
+                            </button>
                         )}
                     </div>
                 )}
+
             </div>
         </div>
     );

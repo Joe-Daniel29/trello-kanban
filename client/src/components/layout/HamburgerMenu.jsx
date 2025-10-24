@@ -42,70 +42,44 @@ const HamburgerMenu = () => {
                         </div>
 
                         <div className="hamburger-content">
-                            {/* Light/Dark Mode Toggle */}
+                            {/* Theme Toggle */}
                             <div className="menu-section">
-                                <div className="menu-section-title">
-                                    {mode === 'light' ? <FaSun /> : <FaMoon />}
-                                    <span>Appearance</span>
-                                </div>
-
-                                <div className="mode-toggle-container">
-                                    <span className={`mode-label ${mode === 'light' ? 'active' : ''}`}>
-                                        <FaSun /> Light
-                                    </span>
+                                <label className="menu-label">Theme</label>
+                                <div className="theme-toggle-container">
+                                    <FaSun className="theme-icon" />
                                     <button 
-                                        className="mode-toggle"
+                                        className="theme-toggle-switch"
                                         onClick={toggleMode}
-                                        aria-label="Toggle light/dark mode"
+                                        aria-label="Toggle theme"
                                     >
-                                        <div className={`mode-toggle-slider ${mode === 'dark' ? 'dark' : 'light'}`}></div>
+                                        <span className={`toggle-slider ${mode}`}></span>
                                     </button>
-                                    <span className={`mode-label ${mode === 'dark' ? 'active' : ''}`}>
-                                        <FaMoon /> Dark
-                                    </span>
+                                    <FaMoon className="theme-icon" />
                                 </div>
                             </div>
 
-                            {/* Color Scheme Section */}
+                            {/* Color Picker */}
                             <div className="menu-section">
-                                <div className="menu-section-title">
-                                    <FaPalette />
-                                    <span>Color Scheme</span>
-                                </div>
-
-                                <div className="color-scheme-options">
+                                <label className="menu-label">Accent Color</label>
+                                <div className="color-options">
                                     {Object.entries(colorSchemes).map(([key, scheme]) => (
                                         <button
                                             key={key}
-                                            className={`color-scheme-button ${colorScheme === key ? 'active' : ''}`}
+                                            className={`color-btn ${colorScheme === key ? 'active' : ''}`}
                                             onClick={() => changeColorScheme(key)}
-                                            style={{ 
-                                                backgroundColor: scheme.primary,
-                                            }}
-                                            aria-label={`${scheme.name} color scheme`}
+                                            style={{ backgroundColor: scheme.primary }}
                                             title={scheme.name}
-                                        >
-                                            {colorScheme === key && (
-                                                <div className="color-scheme-check">✓</div>
-                                            )}
-                                        </button>
+                                        />
                                     ))}
                                 </div>
                             </div>
 
-                            {/* User Section */}
+                            {/* Logout */}
                             {user && (
-                                <div className="menu-section">
-                                    <div className="menu-section-title">
-                                        <FaSignOutAlt />
-                                        <span>Account</span>
-                                    </div>
-
-                                    <button className="logout-button" onClick={handleLogout}>
-                                        <FaSignOutAlt />
-                                        <span>Logout</span>
-                                    </button>
-                                </div>
+                                <button className="logout-btn" onClick={handleLogout}>
+                                    <FaSignOutAlt />
+                                    <span>Logout</span>
+                                </button>
                             )}
                         </div>
                     </div>
