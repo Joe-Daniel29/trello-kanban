@@ -92,7 +92,7 @@ function BoardPage() {
                                 >
                                     <div className="board-card-content">
                                         <h3>{board.name}</h3>
-                                        <span className="board-card-arrow">→</span>
+                                        <div className="board-card-arrow">→</div>
                                     </div>
                                 </Link>
                             ))

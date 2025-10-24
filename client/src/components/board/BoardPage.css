@@ -106,7 +106,7 @@
 
 .board-card:hover {
   border-color: var(--color-primary);
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
 }
 
 .board-card-content {
@@ -123,7 +123,7 @@
 }
 
 .board-card-arrow {
-  color: var(--color-text-secondary);
+  color: rgb(202, 202, 202);
   font-size: 1.25rem;
 }
 
